@@ -1,9 +1,12 @@
-import "reflect-metadata";
+import dotenv from 'dotenv';
+dotenv.config();
 
-import Init from "./init";
+import app from './app';
+import './database';
 
-import AuthenticationController from "./authentication/authentication.controller";
+function init() {
+    app.listen(app.get('port'));
+    console.log('Server on port', 8080);
+};
 
-const app = new Init([new AuthenticationController()]);
-
-app.listen();
+init();
