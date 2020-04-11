@@ -1,26 +1,29 @@
 import express, { Application } from 'express';
 import morgan from 'morgan';
+import * as bodyParser from "body-parser";
+import * as cors from "cors";
 
 import AuthController from './routes/auth';
 import ProductController from './routes/product';
 import SupplierController from './routes/supplier';
 import EmployeeController from './routes/employee';
-
 import SalesController from './routes/sales';
 import LeavesController from './routes/leave';
 import SalaryController from './routes/salary';
 import CustomerReturnController from './routes/customerReturn';
 
 
+
 const app: Application = express();
 
 // settings
-app.set('port', 8080 || process.env.PORT);
+app.set('port', 3000 || process.env.PORT);
 
 // Middlewares
 app.use(morgan('dev'));
 app.use(express.json());
-
+app.use(bodyParser.json());
+app.use(cors.default());
 // Routes
 app.use('/api/auth', AuthController);
 app.use('/api/products', ProductController);
