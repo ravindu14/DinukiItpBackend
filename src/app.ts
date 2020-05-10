@@ -11,6 +11,7 @@ import SalesController from "./routes/sales";
 import LeavesController from "./routes/leave";
 import SalaryController from "./routes/salary";
 import CustomerReturnController from "./routes/customerReturn";
+import OrdersController from "./routes/orders";
 
 const app: Application = express();
 
@@ -31,5 +32,6 @@ app.use("/api/sales", SalesController);
 app.use("/api/leaves", LeavesController);
 app.use("/api/salary", SalaryController);
 app.use("/api/customerReturn", CustomerReturnController);
+app.use("/api/orders", OrdersController);
 
 export default app;

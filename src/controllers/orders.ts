@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import Employee, { IEmployee } from "../models/Employee";
+import Orders, { IOrder } from "../models/orders";
 import Prefix, { IPrefix } from "../models/Prefix";
 
 interface PaginationInfo {
@@ -10,29 +10,29 @@ interface PaginationInfo {
   currentPage: number;
 }
 
-export const getNewEmployeeCode = async (
+export const getNewOrdersId = async (
   req: Request,
   res: Response
 ): Promise<any> => {
   try {
     const prefixes = await Prefix.find();
     console.log(prefixes);
-    let number = prefixes[0].nextEmployeeCode;
+    let number = prefixes[0].nextOrderId;
     const result = await Prefix.findOneAndUpdate(
       { _id: prefixes[0]._id },
       {
         $set: {
-          nextEmployeeCode: number + 1,
+          nextOrderId: number + 1,
         },
       }
     );
     const UpdatedPrefixes = await Prefix.find();
     if (result) {
-      let formattedNumber = "00000" + UpdatedPrefixes[0].nextEmployeeCode;
-      formattedNumber = "EMP" + formattedNumber.slice(-6);
+      let formattedNumber = "00000" + UpdatedPrefixes[0].nextOrderId;
+      formattedNumber = "OD" + formattedNumber.slice(-6);
       return res.status(200).json({
         success: true,
-        employeeId: formattedNumber,
+        orderNumber: formattedNumber,
       });
     }
 
@@ -40,7 +40,7 @@ export const getNewEmployeeCode = async (
       success: false,
       data: {
         errorCode: 500,
-        errorMessage: "Could not get new Employee Code",
+        errorMessage: "Could not get new order Id",
       },
     });
   } catch (error) {
@@ -54,7 +54,7 @@ export const getNewEmployeeCode = async (
   }
 };
 
-export const getAllEmployees = async (
+export const getAllOrders = async (
   req: Request,
   res: Response
 ): Promise<any> => {
@@ -64,19 +64,19 @@ export const getAllEmployees = async (
     const limit = pageSize;
     const skip = (page - 1) * pageSize;
     const sortBy = "-updatedAt";
-    const employeeCount = await Employee.countDocuments();
-    const employees = await Employee.find().limit(limit).skip(skip);
+    const ordersCount = await Orders.countDocuments();
+    const orders = await Orders.find().limit(limit).skip(skip);
 
     let item: any;
 
     let paginationInfo: PaginationInfo = {
-      pages: Math.ceil(employeeCount / pageSize),
+      pages: Math.ceil(ordersCount / pageSize),
       pageSize: pageSize,
-      items: employeeCount,
+      items: ordersCount,
       currentPage: page,
     };
 
-    item = employees;
+    item = orders;
     return res.status(200).json({
       success: true,
       data: {
@@ -95,26 +95,23 @@ export const getAllEmployees = async (
   }
 };
 
-export const getEmployee = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
+export const getOrder = async (req: Request, res: Response): Promise<any> => {
   try {
-    const employee = await Employee.findOne({
-      employeeId: req.params.employeeId,
+    const order = await Orders.findOne({
+      orderId: req.params.orderId,
     });
-    if (employee === null) {
+    if (order === null) {
       return res.status(400).json({
         success: false,
         data: {
           errorCode: 400,
-          errorMessage: "Employee not found or Invalid Employee Code",
+          errorMessage: "Order not found or Invalid Order Id",
         },
       });
     } else {
       return res.status(200).json({
         success: true,
-        data: employee,
+        data: order,
       });
     }
   } catch (error) {
@@ -128,30 +125,30 @@ export const getEmployee = async (
   }
 };
 
-export const createOrUpdateEmployee = async (
+export const createOrUpdateOrder = async (
   req: Request,
   res: Response
 ): Promise<any> => {
   try {
-    const userExists = await Employee.findOne({
-      employeeId: req.body.employeeId,
+    const orderExists = await Orders.findOne({
+      orderId: req.body.orderId,
     });
-    if (userExists)
+    if (orderExists)
       return res.status(400).json({
         success: false,
         data: {
           errorCode: 400,
-          errorMessage: "Employee already exists",
+          errorMessage: "Order already exists",
         },
       });
-    const newEmployee: IEmployee = new Employee(req.body);
-    const result = await newEmployee.save();
+    const newOrder: IOrder = new Orders(req.body);
+    const result = await newOrder.save();
     if (result === null) {
       return res.status(400).json({
         success: false,
         data: {
           errorCode: 400,
-          errorMessage: "Employee not be inserted",
+          errorMessage: "Order cannot be inserted",
         },
       });
     } else {
@@ -171,26 +168,26 @@ export const createOrUpdateEmployee = async (
   }
 };
 
-export const updateEmployee = async (
+export const updateOrder = async (
   req: Request,
   res: Response
 ): Promise<any> => {
   try {
-    const employee = await Employee.findOneAndUpdate(
-      { employeeId: req.body.employeeId },
+    const order = await Orders.findOneAndUpdate(
+      { orderId: req.body.orderId },
       req.body
     );
-    if (employee === null) {
+    if (order === null) {
       return res.status(400).json({
         success: false,
         data: {
           errorCode: 400,
-          errorMessage: "Employee could not be found",
+          errorMessage: "Order could not be found",
         },
       });
     } else {
-      const updatedEmployee = { employeeId: req.body.employeeId, ...req.body };
-      res.status(200).json({ success: true, data: updatedEmployee });
+      const updatedOrder = { orderId: req.body.orderId, ...req.body };
+      res.status(200).json({ success: true, data: updatedOrder });
     }
   } catch (error) {
     return res.status(500).json({
@@ -203,20 +200,20 @@ export const updateEmployee = async (
   }
 };
 
-export const deleteEmployee = async (
+export const deleteOrder = async (
   req: Request,
   res: Response
 ): Promise<any> => {
   try {
-    const employee = await Employee.findOneAndDelete({
-      employeeId: req.params.employeeId,
+    const order = await Orders.findOneAndDelete({
+      orderId: req.params.orderId,
     });
-    if (employee === null) {
+    if (order === null) {
       return res.status(400).json({
         success: true,
         data: {
           errorCode: 400,
-          errorMessage: "Employee could not be found",
+          errorMessage: "Order could not be found",
         },
       });
     } else {

@@ -193,7 +193,7 @@ export const updateSupplier = async (
         supplierCode: req.body.supplierCode,
         ...req.body,
       };
-      res.json({ status: res.status, data: updatedSupplier });
+      res.status(200).json({ success: true, data: updatedSupplier });
     }
   } catch (error) {
     return res.status(500).json({

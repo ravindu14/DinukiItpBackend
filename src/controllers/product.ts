@@ -109,7 +109,7 @@ export const getProduct = async (req: Request, res: Response): Promise<any> => {
         },
       });
     } else {
-      return res.status(400).json({
+      return res.status(200).json({
         success: true,
         data: product,
       });
@@ -206,7 +206,7 @@ export const deleteProduct = async (
 ): Promise<any> => {
   try {
     const product = await Product.findOneAndDelete({
-      productId: req.params.productId,
+      productCode: req.params.productCode,
     });
     if (product === null) {
       return res.status(400).json({

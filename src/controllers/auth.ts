@@ -7,6 +7,13 @@ import {
 } from "../libs/validations/userValidation";
 import jwt from "jsonwebtoken";
 
+interface PaginationInfo {
+  pages: number;
+  pageSize: number;
+  items: number;
+  currentPage: number;
+}
+
 export const signUp = async (req: Request, res: Response) => {
   // Validation
   const { error } = signUpValidation(req.body);
@@ -122,4 +129,134 @@ export const profile = async (req: Request, res: Response) => {
     return res.status(404).json("No User found");
   }
   res.status(200).json({ success: true, data: user });
+};
+
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { email: req.body.email },
+      req.body
+    );
+
+    if (updatedUser === null) {
+      return res.status(404).json({
+        success: false,
+        data: {
+          errorCode: 400,
+          errorMessage: "No User found",
+        },
+      });
+    } else {
+      const updatedRecord = { ...req.body };
+      res.status(200).json({ success: true, data: updatedRecord });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      data: {
+        errorCode: 500,
+        errorMessage: error,
+      },
+    });
+  }
+};
+
+export const getAllProfiles = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const page = parseInt(req.query.page);
+    const pageSize = parseInt(req.query.pageSize);
+    const limit = pageSize;
+    const skip = (page - 1) * pageSize;
+    const sortBy = "-updatedAt";
+    const userCount = await User.countDocuments();
+    const users = await User.find().limit(limit).skip(skip);
+
+    let item: any;
+
+    let paginationInfo: PaginationInfo = {
+      pages: Math.ceil(userCount / pageSize),
+      pageSize: pageSize,
+      items: userCount,
+      currentPage: page,
+    };
+
+    item = users;
+    return res.status(200).json({
+      success: true,
+      data: {
+        paginationInfo,
+        item,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      data: {
+        errorCode: 500,
+        errorMessage: error,
+      },
+    });
+  }
+};
+
+export const deleteUser = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const user = await User.findOneAndDelete({
+      _id: req.params.userId,
+    });
+    if (user === null) {
+      return res.status(400).json({
+        success: true,
+        data: {
+          errorCode: 400,
+          errorMessage: "User could not be found",
+        },
+      });
+    } else {
+      return res.status(200).json({
+        success: true,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      data: {
+        errorCode: 500,
+        errorMessage: error,
+      },
+    });
+  }
+};
+
+export const getUser = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const user = await User.findOne({
+      _id: req.params.userId,
+    });
+    if (user === null) {
+      return res.status(400).json({
+        success: false,
+        data: {
+          errorCode: 400,
+          errorMessage: "User not found",
+        },
+      });
+    } else {
+      return res.status(200).json({
+        success: true,
+        data: user,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      data: {
+        errorCode: 500,
+        errorMessage: error,
+      },
+    });
+  }
 };

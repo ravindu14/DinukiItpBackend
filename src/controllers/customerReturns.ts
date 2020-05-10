@@ -233,3 +233,69 @@ export const deleteCustomerReturn = async (
     });
   }
 };
+
+export const getCustomerReturn = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const customerReturn = await CustomerReturn.findOne({
+      returnId: req.params.returnId,
+    });
+    if (customerReturn === null) {
+      return res.status(400).json({
+        success: false,
+        data: {
+          errorCode: 400,
+          errorMessage: "Return not found or Invalid return Id",
+        },
+      });
+    } else {
+      return res.status(200).json({
+        success: true,
+        data: customerReturn,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      data: {
+        errorCode: 500,
+        errorMessage: error,
+      },
+    });
+  }
+};
+
+export const updateCustomerReturn = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const customerReturn = await CustomerReturn.findOneAndUpdate(
+      { returnId: req.body.returnId },
+      req.body
+    );
+
+    if (customerReturn === null) {
+      return res.status(400).json({
+        success: false,
+        data: {
+          errorCode: 400,
+          errorMessage: "Return could not be found",
+        },
+      });
+    } else {
+      const updatedReturn = { returnId: req.body.returnId, ...req.body };
+      res.status(200).json({ success: true, data: updatedReturn });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      data: {
+        errorCode: 500,
+        errorMessage: error,
+      },
+    });
+  }
+};

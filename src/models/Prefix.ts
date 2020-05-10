@@ -1,56 +1,63 @@
-import { Schema, model, Document } from 'mongoose'
+import { Schema, model, Document } from "mongoose";
 
 export interface IPrefix extends Document {
-    productPrefix: string,
-    nextProductCode:number,
-    supplierPrefix: string,
-    nextSupplierCode:number,
-    employeePrefix: string,
-    nextEmployeeCode:number,
-    salesPrefix: string,
-    nextSalesCode:number,
-    customerReturnPrefix: string,
-    nextCustomerReturnCode:number,
-};
+  productPrefix: string;
+  nextProductCode: number;
+  supplierPrefix: string;
+  nextSupplierCode: number;
+  employeePrefix: string;
+  nextEmployeeCode: number;
+  salesPrefix: string;
+  nextSalesCode: number;
+  customerReturnPrefix: string;
+  nextCustomerReturnCode: number;
+  ordersPrefix: string;
+  nextOrderId: number;
+}
 
-const prefixSchema = new Schema({
+const prefixSchema = new Schema(
+  {
     productPrefix: {
-        type: String,
+      type: String,
     },
     nextProductCode: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     supplierPrefix: {
-        type: String,
+      type: String,
     },
     nextSupplierCode: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     employeePrefix: {
-        type: String,
+      type: String,
     },
     nextEmployeeCode: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     salesPrefix: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     nextSalesCode: {
-        type: Number,
+      type: Number,
     },
     customerReturnPrefix: {
-        type: String,
+      type: String,
     },
     nextCustomerReturnCode: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
-}, {
-    timestamps: true
-});
+    ordersPrefix: { type: String },
+    nextOrderId: { type: Number, required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export default model<IPrefix>('Prefix', prefixSchema);
+export default model<IPrefix>("Prefix", prefixSchema);
