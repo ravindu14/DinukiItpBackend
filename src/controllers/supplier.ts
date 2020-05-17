@@ -212,7 +212,7 @@ export const deleteSupplier = async (
 ): Promise<any> => {
   try {
     const supplier = await Supplier.findOneAndDelete({
-      supplierId: req.params.supplierId,
+      supplierCode: req.params.supplierCode,
     });
     if (supplier === null) {
       return res.status(400).json({
